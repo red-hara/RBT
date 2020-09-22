@@ -1,0 +1,132 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Sources/Executor.cs" type="Script" id=1]
+[ext_resource path="res://Robot.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Sources/CameraMover.gd" type="Script" id=3]
+[ext_resource path="res://Models/floor.obj" type="ArrayMesh" id=4]
+
+[node name="Main" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -1024.0
+margin_bottom = -600.0
+size_flags_horizontal = 15
+size_flags_vertical = 15
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 1024.0
+margin_bottom = 600.0
+size_flags_horizontal = 7
+size_flags_vertical = 7
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+margin_right = 400.0
+margin_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
+margin_right = 400.0
+margin_bottom = 20.0
+
+[node name="Run" type="Button" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+margin_right = 198.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Run"
+
+[node name="Abort" type="Button" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+margin_left = 202.0
+margin_right = 400.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Abort"
+
+[node name="TextEdit" type="TextEdit" parent="HBoxContainer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 400.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 400, 0 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "robot:ptp(home, 1)
+
+a = {X = 500, Y = 0, Z = 600, A = 0, B = 180, C = 0};
+b = {X = -400, Y = 200, Z = 600, A = 0, B = 180, C = 0};
+
+while true do
+	robot:ptp(a)
+	robot:ptp(b)
+	
+	robot:lin(a, 0.5)
+	robot:lin(b, 0.5)
+end"
+highlight_current_line = true
+syntax_highlighting = true
+show_line_numbers = true
+draw_spaces = true
+smooth_scrolling = true
+minimap_draw = true
+caret_blink = true
+
+[node name="ViewportContainer" type="ViewportContainer" parent="HBoxContainer"]
+margin_left = 404.0
+margin_right = 1024.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 500, 500 )
+focus_mode = 1
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+stretch = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Viewport" type="Viewport" parent="HBoxContainer/ViewportContainer"]
+size = Vector2( 620, 600 )
+transparent_bg = true
+handle_input_locally = false
+render_target_update_mode = 3
+physics_object_picking = true
+shadow_atlas_size = 8192
+
+[node name="Spatial" type="Spatial" parent="HBoxContainer/ViewportContainer/Viewport"]
+
+[node name="CameraMover" type="Spatial" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
+transform = Transform( 1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0, 0 )
+script = ExtResource( 3 )
+
+[node name="Camera" type="Camera" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/CameraMover"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2000 )
+near = 10.0
+far = 10000.0
+
+[node name="Robot" parent="HBoxContainer/ViewportContainer/Viewport/Spatial" instance=ExtResource( 2 )]
+
+[node name="Floor" type="MeshInstance" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
+mesh = ExtResource( 4 )
+material/0 = null
+
+[node name="DirectionalLight" type="DirectionalLight" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
+shadow_enabled = true
+shadow_color = Color( 1, 0, 0, 1 )
+
+[node name="Executor" type="Node" parent="."]
+script = ExtResource( 1 )
+robot = NodePath("../HBoxContainer/ViewportContainer/Viewport/Spatial/Robot")
+text = NodePath("../HBoxContainer/VBoxContainer/TextEdit")
+[connection signal="button_down" from="HBoxContainer/VBoxContainer/HBoxContainer/Run" to="Executor" method="Run"]
+[connection signal="button_down" from="HBoxContainer/VBoxContainer/HBoxContainer/Abort" to="Executor" method="Abort"]
