@@ -64,6 +64,8 @@ text = "robot:ptp(home, 1)
 
 a = {X = 500, Y = 0, Z = 600, A = 0, B = 180, C = 0};
 b = {X = -400, Y = 200, Z = 600, A = 0, B = 180, C = 0};
+c = {X = 500, Y = 0, Z = 100, A = 90, B = 90, C = 0};
+d = {X = 100, Y = 0, Z = 800, A = 0, B = 180, C = 0};
 
 while true do
 	robot:ptp(a)
@@ -71,6 +73,13 @@ while true do
 	
 	robot:lin(a, 0.5)
 	robot:lin(b, 0.5)
+	
+	robot:ptp(c)
+	robot:ptp(d)
+	robot:ptp(c)
+	
+	robot:lin(d, 0.5)
+	robot:lin(c, 0.5)
 end"
 highlight_current_line = true
 syntax_highlighting = true
@@ -109,7 +118,7 @@ transform = Transform( 1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0
 script = ExtResource( 3 )
 
 [node name="Camera" type="Camera" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/CameraMover"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2000 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1750 )
 near = 10.0
 far = 10000.0
 
@@ -121,8 +130,12 @@ material/0 = null
 
 [node name="DirectionalLight" type="DirectionalLight" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
+light_bake_mode = 2
 shadow_enabled = true
-shadow_color = Color( 1, 0, 0, 1 )
+directional_shadow_mode = 1
+directional_shadow_normal_bias = 10.0
+directional_shadow_depth_range = 1
+directional_shadow_max_distance = 10000.0
 
 [node name="Executor" type="Node" parent="."]
 script = ExtResource( 1 )

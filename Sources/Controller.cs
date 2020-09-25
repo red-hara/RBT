@@ -67,16 +67,8 @@ public class Controller : Node
         Array.Copy(this.q, _robot.q, 6);
     }
 
-    public void Move(MotionCommand motion, Tool tool = null)
+    public void Move(MotionCommand motion)
     {
-        if (tool == null)
-        {
-            tcp = new Position();
-        }
-        else
-        {
-            tcp = tool.tcp;
-        }
         isMoving = true;
         LinearCommand lin = motion as LinearCommand;
         if (lin != null)
@@ -121,6 +113,11 @@ public class Controller : Node
         }
     }
 
+    public void Stop()
+    {
+        currentInterpolation = null;
+    }
+
     public Position CurrentPosition(float[] q)
     {
         Position p0 = new Position(new Vector3(0, 0, l1), new Quat(Vector3.Back, Mathf.Deg2Rad(q[0])));
@@ -131,6 +128,9 @@ public class Controller : Node
         Position p5 = new Position(new Vector3(l4, 0, 0), new Quat(Vector3.Right, Mathf.Deg2Rad(q[5])));
         Position p6 = new Position(new Vector3(0, 0, 0), new Quat(Vector3.Up, Mathf.Pi / 2) * new Quat(Vector3.Back, Mathf.Pi / 2));
         Position result = p0 * p1 * p2 * p3 * p4 * p5 * p6 * tcp;
+
+        GD.Print(tcp.pos);
+        GD.Print(result.pos);
 
         return result;
     }
@@ -308,9 +308,11 @@ public class Controller : Node
     {
         public Dictionary<CartesianAxis, float> t = new Dictionary<CartesianAxis, float>();
 
-        public Position AsPosition(Position current)
+        public Position AsPosition(Position current = null)
         {
-
+            if (current == null) {
+                current = new Position();
+            }
             Vector3 pos = current.pos;
             Vector3 euler = Quat2Abc(current.rot);
             if (t.ContainsKey(CartesianAxis.X)) { pos.x = t[CartesianAxis.X]; }

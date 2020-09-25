@@ -1,14 +1,13 @@
 using Godot;
 using System;
 using System.Reflection;
-using System.Collections.Generic;
 using NLua;
 
 public class Executor : Node
 {
     [Export]
     public NodePath robot;
-    private Controller _controller;
+    private Controller controller;
 
     [Export]
     public NodePath text;
@@ -20,22 +19,33 @@ public class Executor : Node
     public override void _Ready()
     {
         _text = GetNode(text) as TextEdit;
-        _controller = (GetNode(robot) as Robot).controller; ;
+        controller = (GetNode(robot) as Robot).controller; ;
     }
+
+    public override void _Notification(int notificationCode)
+    {
+        if (notificationCode == MainLoop.NotificationWmQuitRequest)
+        {
+            Abort();
+            GetTree().Quit();
+        }
+    }
+
     public override void _Process(float delta)
     {
         if (worker != null)
         {
-            if (worker.robot.currentCommand != null && !_controller.finishedWithError)
+            controller.tcp = worker.robot.currentTool;
+            if (worker.robot.currentCommand != null && !controller.finishedWithError)
             {
-                _controller.Move(worker.robot.currentCommand, null);
+                controller.Move(worker.robot.currentCommand);
                 worker.robot.SetCurrentCommand(null);
             }
-            if (!_controller.isMoving)
+            if (!controller.isMoving)
             {
                 worker.robot.doneCommand = true;
             }
-            if (worker.doneEverything || _controller.finishedWithError)
+            if (worker.doneEverything || controller.finishedWithError)
             {
                 Abort();
             }
@@ -44,7 +54,7 @@ public class Executor : Node
 
     public void Run()
     {
-        _controller.finishedWithError = false;
+        controller.finishedWithError = false;
         if (appDomain == null)
         {
             AppDomainSetup ads = new AppDomainSetup();
@@ -72,6 +82,7 @@ public class Executor : Node
             appDomain = null;
             worker = null;
         }
+        controller.Stop();
     }
 
     [Serializable]
@@ -115,31 +126,26 @@ public class Executor : Node
     {
         public bool doneCommand = false;
         public Controller.MotionCommand currentCommand = null;
+        public Controller.Position currentTool = new Controller.Position();
 
         public void lin(LuaTable table, float velocity)
         {
-            try
-            {
-                doneCommand = false;
-                Controller.LinearCommand command = new Controller.LinearCommand();
-                command.velocity = Mathf.Min(Mathf.Max(velocity, 1), 2);
-                if (table["X"] != null) { command.target.t[Controller.CartesianAxis.X] = LuaNumber2Float(table["X"]); }
-                if (table["Y"] != null) { command.target.t[Controller.CartesianAxis.Y] = LuaNumber2Float(table["Y"]); }
-                if (table["Z"] != null) { command.target.t[Controller.CartesianAxis.Z] = LuaNumber2Float(table["Z"]); }
-                if (table["A"] != null) { command.target.t[Controller.CartesianAxis.A] = LuaNumber2Float(table["A"]); }
-                if (table["B"] != null) { command.target.t[Controller.CartesianAxis.B] = LuaNumber2Float(table["B"]); }
-                if (table["C"] != null) { command.target.t[Controller.CartesianAxis.C] = LuaNumber2Float(table["C"]); }
-                currentCommand = command;
+            doneCommand = false;
+            Controller.LinearCommand command = new Controller.LinearCommand();
+            command.velocity = Mathf.Min(Mathf.Max(velocity, 0.001f), 2);
+            if (table["X"] != null) { command.target.t[Controller.CartesianAxis.X] = LuaNumber2Float(table["X"]); }
+            if (table["Y"] != null) { command.target.t[Controller.CartesianAxis.Y] = LuaNumber2Float(table["Y"]); }
+            if (table["Z"] != null) { command.target.t[Controller.CartesianAxis.Z] = LuaNumber2Float(table["Z"]); }
+            if (table["A"] != null) { command.target.t[Controller.CartesianAxis.A] = LuaNumber2Float(table["A"]); }
+            if (table["B"] != null) { command.target.t[Controller.CartesianAxis.B] = LuaNumber2Float(table["B"]); }
+            if (table["C"] != null) { command.target.t[Controller.CartesianAxis.C] = LuaNumber2Float(table["C"]); }
+            currentCommand = command;
 
-                while (!doneCommand)
-                {
-                    System.Threading.Thread.Sleep(10);
-                }
-            }
-            catch (Exception ex)
+            while (!doneCommand)
             {
-                GD.Print(ex);
+                System.Threading.Thread.Sleep(10);
             }
+
         }
 
         public void lin(LuaTable table)
@@ -149,55 +155,54 @@ public class Executor : Node
 
         public void ptp(LuaTable table, float velocity)
         {
-            try
+
+            bool isJnt = false;
+            bool isPtp = false;
+            doneCommand = false;
+            Controller.JointCommand jnt = new Controller.JointCommand();
+            jnt.velocity = Mathf.Min(Mathf.Max(velocity, 0.01f), 1.0f);
+            if (table["A1"] != null) { jnt.target.q[Controller.Axis.A1] = LuaNumber2Float(table["A1"]); isJnt = true; }
+            if (table["A2"] != null) { jnt.target.q[Controller.Axis.A2] = LuaNumber2Float(table["A2"]); isJnt = true; }
+            if (table["A3"] != null) { jnt.target.q[Controller.Axis.A3] = LuaNumber2Float(table["A3"]); isJnt = true; }
+            if (table["A4"] != null) { jnt.target.q[Controller.Axis.A4] = LuaNumber2Float(table["A4"]); isJnt = true; }
+            if (table["A5"] != null) { jnt.target.q[Controller.Axis.A5] = LuaNumber2Float(table["A5"]); isJnt = true; }
+            if (table["A6"] != null) { jnt.target.q[Controller.Axis.A6] = LuaNumber2Float(table["A6"]); isJnt = true; }
+
+            Controller.PtpCommand ptp = new Controller.PtpCommand();
+            if (table["X"] != null) { ptp.target.t[Controller.CartesianAxis.X] = LuaNumber2Float(table["X"]); isPtp = true; }
+            if (table["Y"] != null) { ptp.target.t[Controller.CartesianAxis.Y] = LuaNumber2Float(table["Y"]); isPtp = true; }
+            if (table["Z"] != null) { ptp.target.t[Controller.CartesianAxis.Z] = LuaNumber2Float(table["Z"]); isPtp = true; }
+            if (table["A"] != null) { ptp.target.t[Controller.CartesianAxis.A] = LuaNumber2Float(table["A"]); isPtp = true; }
+            if (table["B"] != null) { ptp.target.t[Controller.CartesianAxis.B] = LuaNumber2Float(table["B"]); isPtp = true; }
+            if (table["C"] != null) { ptp.target.t[Controller.CartesianAxis.C] = LuaNumber2Float(table["C"]); isPtp = true; }
+
+            if (isJnt && isPtp)
             {
-                bool isJnt = false;
-                bool isPtp = false;
-                doneCommand = false;
-                Controller.JointCommand jnt = new Controller.JointCommand();
-                jnt.velocity = Mathf.Min(Mathf.Max(velocity, 0.01f), 1.0f);
-                if (table["A1"] != null) { jnt.target.q[Controller.Axis.A1] = LuaNumber2Float(table["A1"]); isJnt = true; }
-                if (table["A2"] != null) { jnt.target.q[Controller.Axis.A2] = LuaNumber2Float(table["A2"]); isJnt = true; }
-                if (table["A3"] != null) { jnt.target.q[Controller.Axis.A3] = LuaNumber2Float(table["A3"]); isJnt = true; }
-                if (table["A4"] != null) { jnt.target.q[Controller.Axis.A4] = LuaNumber2Float(table["A4"]); isJnt = true; }
-                if (table["A5"] != null) { jnt.target.q[Controller.Axis.A5] = LuaNumber2Float(table["A5"]); isJnt = true; }
-                if (table["A6"] != null) { jnt.target.q[Controller.Axis.A6] = LuaNumber2Float(table["A6"]); isJnt = true; }
-
-                Controller.PtpCommand ptp = new Controller.PtpCommand();
-                if (table["X"] != null) { ptp.target.t[Controller.CartesianAxis.X] = LuaNumber2Float(table["X"]); isPtp = true; }
-                if (table["Y"] != null) { ptp.target.t[Controller.CartesianAxis.Y] = LuaNumber2Float(table["Y"]); isPtp = true; }
-                if (table["Z"] != null) { ptp.target.t[Controller.CartesianAxis.Z] = LuaNumber2Float(table["Z"]); isPtp = true; }
-                if (table["A"] != null) { ptp.target.t[Controller.CartesianAxis.A] = LuaNumber2Float(table["A"]); isPtp = true; }
-                if (table["B"] != null) { ptp.target.t[Controller.CartesianAxis.B] = LuaNumber2Float(table["B"]); isPtp = true; }
-                if (table["C"] != null) { ptp.target.t[Controller.CartesianAxis.C] = LuaNumber2Float(table["C"]); isPtp = true; }
-
-                if (isJnt && isPtp)
-                {
-                    return;
-                }
-                if (isJnt)
-                {
-                    currentCommand = jnt;
-                }
-                else if (isPtp)
-                {
-                    currentCommand = ptp;
-                }
-
-                while (!doneCommand)
-                {
-                    System.Threading.Thread.Sleep(10);
-                }
+                return;
             }
-            catch (Exception ex)
+            if (isJnt)
             {
-                GD.Print(ex);
+                currentCommand = jnt;
+            }
+            else if (isPtp)
+            {
+                currentCommand = ptp;
+            }
+
+            while (!doneCommand)
+            {
+                System.Threading.Thread.Sleep(10);
             }
         }
 
         public void ptp(LuaTable table)
         {
             ptp(table, 1.0f);
+        }
+
+        public void tool(LuaTable table)
+        {
+            currentTool = LuaTable2Position(table);
         }
 
         public void SetCurrentCommand(Controller.MotionCommand command)
@@ -208,6 +213,18 @@ public class Executor : Node
         private float LuaNumber2Float(object obj)
         {
             return Convert.ToSingle(obj);
+        }
+
+        private Controller.Position LuaTable2Position(LuaTable table)
+        {
+            Controller.CartesianTarget position = new Controller.CartesianTarget();
+            position.t[Controller.CartesianAxis.X] = LuaNumber2Float(table["X"]);
+            position.t[Controller.CartesianAxis.Y] = LuaNumber2Float(table["Y"]);
+            position.t[Controller.CartesianAxis.Z] = LuaNumber2Float(table["Z"]);
+            position.t[Controller.CartesianAxis.A] = LuaNumber2Float(table["A"]);
+            position.t[Controller.CartesianAxis.B] = LuaNumber2Float(table["B"]);
+            position.t[Controller.CartesianAxis.C] = LuaNumber2Float(table["C"]);
+            return position.AsPosition(null);
         }
     }
 }
