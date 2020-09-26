@@ -129,9 +129,6 @@ public class Controller : Node
         Position p6 = new Position(new Vector3(0, 0, 0), new Quat(Vector3.Up, Mathf.Pi / 2) * new Quat(Vector3.Back, Mathf.Pi / 2));
         Position result = p0 * p1 * p2 * p3 * p4 * p5 * p6 * tcp;
 
-        GD.Print(tcp.pos);
-        GD.Print(result.pos);
-
         return result;
     }
 

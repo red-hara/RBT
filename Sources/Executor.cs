@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 using NLua;
 
 public class Executor : Node
@@ -19,7 +20,7 @@ public class Executor : Node
     public override void _Ready()
     {
         _text = GetNode(text) as TextEdit;
-        controller = (GetNode(robot) as Robot).controller; ;
+        controller = (GetNode(robot) as Robot).controller;
     }
 
     public override void _Notification(int notificationCode)
@@ -41,9 +42,10 @@ public class Executor : Node
                 controller.Move(worker.robot.currentCommand);
                 worker.robot.SetCurrentCommand(null);
             }
-            if (!controller.isMoving)
+            else if (!controller.isMoving)
             {
                 worker.robot.doneCommand = true;
+                worker.robot.currentPosition = controller.CurrentPosition(controller.q);
             }
             if (worker.doneEverything || controller.finishedWithError)
             {
@@ -54,9 +56,10 @@ public class Executor : Node
 
     public void Run()
     {
-        controller.finishedWithError = false;
         if (appDomain == null)
         {
+            controller.finishedWithError = false;
+
             AppDomainSetup ads = new AppDomainSetup();
             ads.ApplicationBase = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -101,6 +104,7 @@ public class Executor : Node
         private void _Run(object code)
         {
             Lua lua = new Lua();
+            robot.currentLua = lua;
             lua["robot"] = robot;
             lua.NewTable("home");
             (lua["home"] as LuaTable)["A1"] = 0.0f;
@@ -124,6 +128,9 @@ public class Executor : Node
     [Serializable]
     private class Rbt : MarshalByRefObject
     {
+        public LuaTable cur;
+        public Lua currentLua;
+        public Controller.Position currentPosition;
         public bool doneCommand = false;
         public Controller.MotionCommand currentCommand = null;
         public Controller.Position currentTool = new Controller.Position();
@@ -155,7 +162,6 @@ public class Executor : Node
 
         public void ptp(LuaTable table, float velocity)
         {
-
             bool isJnt = false;
             bool isPtp = false;
             doneCommand = false;
@@ -203,6 +209,21 @@ public class Executor : Node
         public void tool(LuaTable table)
         {
             currentTool = LuaTable2Position(table);
+        }
+
+        public LuaTable current()
+        {
+            currentLua.NewTable("robot.cur");
+            LuaTable result = currentLua["robot.cur"] as LuaTable;
+            Vector3 cba = Controller.Quat2Abc(currentPosition.rot);
+            Vector3 xyz = currentPosition.pos;
+            result["X"] = xyz.x;
+            result["Y"] = xyz.y;
+            result["Z"] = xyz.z;
+            result["A"] = Mathf.Rad2Deg(cba.z);
+            result["B"] = Mathf.Rad2Deg(cba.y);
+            result["C"] = Mathf.Rad2Deg(cba.x);
+            return result;
         }
 
         public void SetCurrentCommand(Controller.MotionCommand command)
