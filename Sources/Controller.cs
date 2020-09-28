@@ -45,13 +45,7 @@ public class Controller : Node
 
     public override void _Process(float delta)
     {
-        if (run)
-        {
-            run = false;
-            LinearCommand linearCommand = new LinearCommand();
-            linearCommand.target.t[CartesianAxis.Z] = 400;
-            Move(linearCommand);
-        }
+        _robot.tcp.Transform = new Transform(tcp.rot, tcp.pos);
 
         if (currentInterpolation != null)
         {

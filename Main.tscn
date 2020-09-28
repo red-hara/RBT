@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Sources/Executor.cs" type="Script" id=1]
 [ext_resource path="res://Robot.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Sources/CameraMover.gd" type="Script" id=3]
 [ext_resource path="res://Models/floor.obj" type="ArrayMesh" id=4]
+[ext_resource path="res://Models/Material.material" type="Material" id=5]
 
 [node name="Main" type="Control"]
 anchor_right = 1.0
@@ -56,31 +57,27 @@ text = "Abort"
 [node name="TextEdit" type="TextEdit" parent="HBoxContainer/VBoxContainer"]
 margin_top = 24.0
 margin_right = 400.0
-margin_bottom = 600.0
+margin_bottom = 564.0
 rect_min_size = Vector2( 400, 0 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "robot:ptp(home, 1)
 
-a = {X = 500, Y = 0, Z = 600, A = 0, B = 180, C = 0};
-b = {X = -400, Y = 200, Z = 600, A = 0, B = 180, C = 0};
-c = {X = 500, Y = 0, Z = 100, A = 90, B = 90, C = 0};
-d = {X = 100, Y = 0, Z = 800, A = 0, B = 180, C = 0};
+robot:tool({Z = 100})
 
-while true do
-	robot:ptp(a)
-	robot:ptp(b)
-	
-	robot:lin(a, 0.5)
-	robot:lin(b, 0.5)
-	
-	robot:ptp(c)
-	robot:ptp(d)
-	robot:ptp(c)
-	
-	robot:lin(d, 0.5)
-	robot:lin(c, 0.5)
-end"
+boxHeight = 300
+boxSize = 100
+boxStep = 150
+boxOrigin = 350
+
+target = {X = boxOrigin, Y = 0, Z = boxHeight + boxSize, A = 0, B = 0, C = 180}
+robot:ptp(target)
+target.X = target.X + boxStep
+robot:lin(target, 0.25)
+target.Y = target.Y - boxStep
+robot:lin(target, 0.25)
+target.X = target.X + boxStep
+robot:lin(target, 0.25)"
 highlight_current_line = true
 syntax_highlighting = true
 show_line_numbers = true
@@ -88,6 +85,19 @@ draw_spaces = true
 smooth_scrolling = true
 minimap_draw = true
 caret_blink = true
+
+[node name="PositionLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+margin_top = 568.0
+margin_right = 400.0
+margin_bottom = 582.0
+
+[node name="ErrorLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+margin_top = 586.0
+margin_right = 400.0
+margin_bottom = 600.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="ViewportContainer" type="ViewportContainer" parent="HBoxContainer"]
 margin_left = 404.0
@@ -137,9 +147,76 @@ directional_shadow_normal_bias = 10.0
 directional_shadow_depth_range = 1
 directional_shadow_max_distance = 10000.0
 
+[node name="Spatial" type="Spatial" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
+
+[node name="CSGBox" type="CSGBox" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 500, 350, 0 )
+width = 100.0
+height = 100.0
+depth = 100.0
+material = ExtResource( 5 )
+
+[node name="CSGBox2" type="CSGBox" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 650, 350, 0 )
+width = 100.0
+height = 100.0
+depth = 100.0
+material = ExtResource( 5 )
+
+[node name="CSGBox3" type="CSGBox" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 500, 350, 150 )
+width = 100.0
+height = 100.0
+depth = 100.0
+material = ExtResource( 5 )
+
+[node name="CSGBox4" type="CSGBox" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 650, 350, 150 )
+width = 100.0
+height = 100.0
+depth = 100.0
+material = ExtResource( 5 )
+
+[node name="CSGBox5" type="CSGBox" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 350, 350, 150 )
+width = 100.0
+height = 100.0
+depth = 100.0
+material = ExtResource( 5 )
+
+[node name="CSGBox7" type="CSGBox" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 500, 350, 300 )
+width = 100.0
+height = 100.0
+depth = 100.0
+material = ExtResource( 5 )
+
+[node name="CSGBox8" type="CSGBox" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 650, 350, 300 )
+width = 100.0
+height = 100.0
+depth = 100.0
+material = ExtResource( 5 )
+
+[node name="CSGBox9" type="CSGBox" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 350, 350, 300 )
+width = 100.0
+height = 100.0
+depth = 100.0
+material = ExtResource( 5 )
+
+[node name="CSGBox6" type="CSGBox" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 350, 350, 0 )
+width = 100.0
+height = 100.0
+depth = 100.0
+material = ExtResource( 5 )
+
 [node name="Executor" type="Node" parent="."]
 script = ExtResource( 1 )
 robot = NodePath("../HBoxContainer/ViewportContainer/Viewport/Spatial/Robot")
+positionLabel = NodePath("../HBoxContainer/VBoxContainer/PositionLabel")
+errorLabel = NodePath("../HBoxContainer/VBoxContainer/ErrorLabel")
 text = NodePath("../HBoxContainer/VBoxContainer/TextEdit")
 [connection signal="button_down" from="HBoxContainer/VBoxContainer/HBoxContainer/Run" to="Executor" method="Run"]
 [connection signal="button_down" from="HBoxContainer/VBoxContainer/HBoxContainer/Abort" to="Executor" method="Abort"]

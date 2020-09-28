@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Sources/Controller.cs" type="Script" id=1]
 [ext_resource path="res://Models/Bone5.obj" type="ArrayMesh" id=2]
@@ -9,17 +9,19 @@
 [ext_resource path="res://Models/Bone1.obj" type="ArrayMesh" id=7]
 [ext_resource path="res://Models/Bone6.obj" type="ArrayMesh" id=8]
 [ext_resource path="res://Sources/Robot.cs" type="Script" id=9]
+[ext_resource path="res://Models/Axis.obj" type="ArrayMesh" id=10]
 
 [node name="Robot" type="Spatial"]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
 script = ExtResource( 9 )
-q = PoolRealArray( 0, 0, 0, 0, 90, 0 )
-bone6 = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6")
-bone3 = NodePath("Bone0/Bone1/Bone2/Bone3")
-flangePath = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6/Flange")
-bone0 = NodePath("Bone0")
-controllerPath = NodePath("Controller")
 bone1 = NodePath("Bone0/Bone1")
+q = PoolRealArray( 0, 0, 0, 0, 90, 0 )
+bone3 = NodePath("Bone0/Bone1/Bone2/Bone3")
+bone0 = NodePath("Bone0")
+tcpPath = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6/Flange/Tcp")
+controllerPath = NodePath("Controller")
+bone6 = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6")
+flangePath = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6/Flange")
 bone4 = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4")
 bone5 = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5")
 bone2 = NodePath("Bone0/Bone1/Bone2")
@@ -64,7 +66,7 @@ mesh = ExtResource( 3 )
 material/0 = null
 
 [node name="Bone5" type="Spatial" parent="Bone0/Bone1/Bone2/Bone3/Bone4"]
-transform = Transform( -1.62921e-07, 0, 1, 0, 1, 0, -1, 0, -1.62921e-07, 220, 0, 0 )
+transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 220, 0, 0 )
 
 [node name="MeshInstance" type="MeshInstance" parent="Bone0/Bone1/Bone2/Bone3/Bone4/Bone5"]
 transform = Transform( 1, -8.59643e-17, 1.77636e-15, 3.55271e-15, -4.37114e-08, -1, 7.55401e-16, 1, -4.37114e-08, 0, 0, 0 )
@@ -81,6 +83,16 @@ material/0 = null
 
 [node name="Flange" type="Spatial" parent="Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6"]
 transform = Transform( -1.62921e-07, 0, 1, 0, 1, 0, -0.999999, 0, -1.62921e-07, 10.0001, -6.10352e-05, 9.15527e-05 )
+
+[node name="Tcp" type="Spatial" parent="Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6/Flange"]
+
+[node name="MeshInstance" type="MeshInstance" parent="Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6/Flange/Tcp"]
+transform = Transform( 10, 1.50996e-06, -6.60024e-14, -1.35525e-20, -4.37114e-07, -10, -1.50996e-06, 10, -4.37114e-07, 0, 0, 0 )
+mesh = ExtResource( 10 )
+material/0 = null
+material/1 = null
+material/2 = null
+material/3 = null
 
 [node name="Controller" type="Node" parent="."]
 script = ExtResource( 1 )

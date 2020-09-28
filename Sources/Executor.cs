@@ -11,16 +11,28 @@ public class Executor : Node
     private Controller controller;
 
     [Export]
+    public NodePath positionLabel;
+    private Label _positionLabel;
+
+    [Export]
+    public NodePath errorLabel;
+    private Label _errorLabel;
+
+    [Export]
     public NodePath text;
     private TextEdit _text;
 
     private AppDomain appDomain = null;
     private Worker worker = null;
 
+    private bool shallNotify = false;
+
     public override void _Ready()
     {
         _text = GetNode(text) as TextEdit;
         controller = (GetNode(robot) as Robot).controller;
+        _positionLabel = GetNode(positionLabel) as Label;
+        _errorLabel = GetNode(errorLabel) as Label;
     }
 
     public override void _Notification(int notificationCode)
@@ -41,18 +53,44 @@ public class Executor : Node
             {
                 controller.Move(worker.robot.currentCommand);
                 worker.robot.SetCurrentCommand(null);
+                shallNotify = true;
             }
-            else if (!controller.isMoving)
+            else if (!controller.isMoving && shallNotify)
             {
+                shallNotify = false;
                 worker.robot.doneCommand = true;
                 worker.robot.currentPosition = controller.CurrentPosition(controller.q);
             }
+
+            if (worker.error == null)
+            {
+                _errorLabel.Text = "";
+            }
+            else
+            {
+                _errorLabel.Text = worker.error;
+            }
+
             if (worker.doneEverything || controller.finishedWithError)
             {
                 Abort();
             }
         }
+        Controller.Position currentPosition = controller.CurrentPosition(controller.q);
+        Vector3 cba = Controller.Quat2Abc(currentPosition.rot);
+        Vector3 xyz = currentPosition.pos;
+        _positionLabel.Text =
+            "{X = " +  Round2(xyz.x) +
+            ", Y = " + Round2(xyz.y) +
+            ", Z = " + Round2(xyz.z) +
+            ", A = " + Round2(Mathf.Rad2Deg(cba.z)) +
+            ", B = " + Round2(Mathf.Rad2Deg(cba.y)) +
+            ", C = " + Round2(Mathf.Rad2Deg(cba.x)) + "}";
     }
+
+    public static float Round2(float a) {
+        return Mathf.Round(a * 100) / 100.0f;
+    } 
 
     public void Run()
     {
@@ -94,6 +132,7 @@ public class Executor : Node
 
         public bool doneEverything = false;
         public Rbt robot = new Rbt();
+        public String error = null;
 
         public void Start(String code)
         {
@@ -120,6 +159,7 @@ public class Executor : Node
             catch (Exception ex)
             {
                 GD.Print(ex);
+                error = ex.Message;
             }
             doneEverything = true;
         }
@@ -209,6 +249,7 @@ public class Executor : Node
         public void tool(LuaTable table)
         {
             currentTool = LuaTable2Position(table);
+            System.Threading.Thread.Sleep(10);
         }
 
         public LuaTable current()
