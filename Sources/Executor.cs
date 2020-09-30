@@ -154,6 +154,26 @@ public class Executor : Node
             (lua["home"] as LuaTable)["A4"] = 0.0f;
             (lua["home"] as LuaTable)["A5"] = 90.0f;
             (lua["home"] as LuaTable)["A6"] = 0.0f;
+            lua.DoString(
+                @"
+                function ptp(t, v)
+                    v = v or 1
+                    robot:ptp(t, v)
+                end
+                function lin(t, v)
+                    v = v or 1
+                    robot:lin(t, v)
+                end
+                function tool(t)
+                    robot:tool(t)
+                end
+                function wait(t)
+                    robot:wait(t)
+                end
+                function current()
+                    return robot:current()
+                end
+                ");
             try
             {
                 lua.DoString(code as string);
@@ -192,7 +212,7 @@ public class Executor : Node
 
             while (!doneCommand)
             {
-                System.Threading.Thread.Sleep(10);
+                System.Threading.Thread.Sleep(1);
             }
 
         }
@@ -239,7 +259,7 @@ public class Executor : Node
 
             while (!doneCommand)
             {
-                System.Threading.Thread.Sleep(10);
+                System.Threading.Thread.Sleep(1);
             }
         }
 
@@ -251,7 +271,7 @@ public class Executor : Node
         public void tool(LuaTable table)
         {
             currentTool = LuaTable2Position(table);
-            System.Threading.Thread.Sleep(10);
+            System.Threading.Thread.Sleep(1);
         }
 
         public LuaTable current()
