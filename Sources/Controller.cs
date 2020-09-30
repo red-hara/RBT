@@ -69,6 +69,7 @@ public class Controller : Node
         LinearCommand lin = motion as LinearCommand;
         if (lin != null)
         {
+            i = CalculateI(q);
             Position current = CurrentPosition(q);
             currentInterpolation = new LinearInterpolation(
                 current,
@@ -81,16 +82,19 @@ public class Controller : Node
         JointCommand jnt = motion as JointCommand;
         if (jnt != null)
         {
-            try {
+            try
+            {
                 float[] target = jnt.target.AsArray(q);
                 VerifySolution(target);
-            
-            currentInterpolation = new JointInterpolation(
-                q,
-                jnt.target.AsArray(q),
-                jnt.velocity
-            );
-            } catch (Exception ex) {
+
+                currentInterpolation = new JointInterpolation(
+                    q,
+                    jnt.target.AsArray(q),
+                    jnt.velocity
+                );
+            }
+            catch (Exception ex)
+            {
                 currentError = ex.Message;
                 finishedWithError = true;
             }
@@ -101,7 +105,13 @@ public class Controller : Node
         {
             try
             {
-                float[] sol = Solve(ptp.target.AsPosition(CurrentPosition(q)), q, 1, 1, 1).AsArray();
+                i = CalculateI(q);
+                float[] sol = Solve(ptp.target.AsPosition(
+                    CurrentPosition(q)),
+                    ptp.target.i0(i[0]),
+                    ptp.target.i1(i[1]),
+                    ptp.target.i2(i[2])
+                    ).AsArray();
                 currentInterpolation = new JointInterpolation(
                     q,
                     sol,
@@ -136,8 +146,33 @@ public class Controller : Node
         return result;
     }
 
-    public Solution Solve(Position target, float[] current, int i0 = 1, int i1 = 1, int i2 = 1)
+    public int[] CalculateI(float[] q)
     {
+        Position p0 = new Position(new Vector3(0, 0, l1), new Quat(Vector3.Back, 0));
+        Position p1 = new Position(new Vector3(Controller.p2, 0, 0), new Quat(Vector3.Up, Mathf.Deg2Rad(q[1])));
+        Position p2 = new Position(new Vector3(0, 0, l2), new Quat(Vector3.Up, Mathf.Deg2Rad(q[2])));
+        Position p3 = new Position(new Vector3(l3, 0, Controller.p3), new Quat(Vector3.Right, 0));
+        Position r = p0 * p1 * p2 * p3;
+        int[] result = { 1, 1, 1 };
+        if (r.pos.x < 0)
+        {
+            result[0] *= -1;
+        }
+        if (q[2] * result[0] < 0)
+        {
+            result[1] *= -1;
+        }
+        if (q[5] < 0)
+        {
+            result[2] *= -1;
+        }
+        GD.Print(result[0], result[1], result[2]);
+        return result;
+    }
+
+    public Solution Solve(Position target, int i0, int i1, int i2)
+    {
+        GD.Print(i0, i1, i2);
         target = target * tcp.Inverse();
         Position fifth = target * new Position(new Vector3(0, 0, -l4), Quat.Identity);
         Vector3 projection = new Vector3(fifth.pos.x, fifth.pos.y, 0);
@@ -180,15 +215,17 @@ public class Controller : Node
         return new Solution(sol);
     }
 
-    public void VerifySolution(float[] sol) {
-        for (int i = 0; i < 6; i++) {
+    public void VerifySolution(float[] sol)
+    {
+        for (int i = 0; i < 6; i++)
+        {
             if (sol[i] > max[i])
             {
-                throw new SolutionException("Axis A" + i + " out of limit: " + sol[i]);
+                throw new SolutionException("Axis A" + (i + 1) + " out of limit: " + sol[i]);
             }
             if (sol[i] < -min[i])
             {
-                throw new SolutionException("Axis -A" + i + " out of limit: " + sol[i]);
+                throw new SolutionException("Axis -A" + (i + 1) + " out of limit: " + sol[i]);
             }
         }
     }
@@ -313,11 +350,13 @@ public class Controller : Node
     [Serializable]
     public class CartesianTarget : Target
     {
+        public int i = -1;
         public Dictionary<CartesianAxis, float> t = new Dictionary<CartesianAxis, float>();
 
         public Position AsPosition(Position current = null)
         {
-            if (current == null) {
+            if (current == null)
+            {
                 current = new Position();
             }
             Vector3 pos = current.pos;
@@ -331,6 +370,33 @@ public class Controller : Node
             Quat rot = Abc2Quat(euler);
             return new Position(pos, rot);
         }
+
+        public int i0(int def)
+        {
+            if (i == -1)
+            {
+                return def;
+            }
+            return ((i & 0b100) == 0b100) ? 1 : -1;
+        }
+
+        public int i1(int def)
+        {
+            if (i == -1)
+            {
+                return def;
+            }
+            return ((i & 0b010) == 0b010) ? 1 : -1;
+        }
+
+        public int i2(int def)
+        {
+            if (i == -1)
+            {
+                return def;
+            }
+            return ((i & 0b001) == 0b001) ? 1 : -1;
+        }
     }
 
     [Serializable]
@@ -341,7 +407,8 @@ public class Controller : Node
         Z,
         A,
         B,
-        C
+        C,
+        I,
     }
 
     [Serializable]
@@ -407,7 +474,7 @@ public class Controller : Node
             base.Apply(controller);
             try
             {
-                Solution solution = controller.Solve(current, controller.q, i0, i1, i2);
+                Solution solution = controller.Solve(current, i0, i1, i2);
                 controller.q = solution.AsArray();
             }
             catch (SolutionException ex)

@@ -243,10 +243,11 @@ public class Executor : Node
             if (table["A"] != null) { ptp.target.t[Controller.CartesianAxis.A] = LuaNumber2Float(table["A"]); isPtp = true; }
             if (table["B"] != null) { ptp.target.t[Controller.CartesianAxis.B] = LuaNumber2Float(table["B"]); isPtp = true; }
             if (table["C"] != null) { ptp.target.t[Controller.CartesianAxis.C] = LuaNumber2Float(table["C"]); isPtp = true; }
+            if (table["I"] != null) { ptp.target.i = LuaNumber2Int(table["I"]); isPtp = true; }
 
             if (isJnt && isPtp)
             {
-                return;
+                throw new ArgumentException("Both ptp and jnt arguments.");
             }
             if (isJnt)
             {
@@ -298,9 +299,14 @@ public class Executor : Node
             System.Threading.Thread.Sleep((int)(seconds * 1000));
         }
 
-        private float LuaNumber2Float(object obj)
+        private static float LuaNumber2Float(object obj)
         {
             return Convert.ToSingle(obj);
+        }
+
+        private static int LuaNumber2Int(object obj)
+        {
+            return Convert.ToInt32(obj);
         }
 
         private Controller.Position LuaTable2Position(LuaTable table)

@@ -1,0 +1,25 @@
+ptp(home)
+
+target = {X = 0, Y = 500, Z = 950, A = 0, B = 0, C = 0, I = 000}
+ptp(target)
+
+target.I = 001
+ptp(target)
+
+target.I = 010
+ptp(target)
+
+target.I = 011
+ptp(target)
+
+target.I = 100
+ptp(target)
+
+target.I = 101
+ptp(target)
+
+target.I = 110
+ptp(target)
+
+target.I = 111
+ptp(target)
