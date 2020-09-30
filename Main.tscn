@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Sources/Executor.cs" type="Script" id=1]
 [ext_resource path="res://Robot.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Sources/CameraMover.gd" type="Script" id=3]
 [ext_resource path="res://Models/floor.obj" type="ArrayMesh" id=4]
 [ext_resource path="res://Models/Material.material" type="Material" id=5]
+[ext_resource path="res://Models/Axis.obj" type="ArrayMesh" id=6]
 
 [node name="Main" type="Control"]
 anchor_right = 1.0
@@ -228,6 +229,14 @@ width = 100.0
 height = 100.0
 depth = 100.0
 material = ExtResource( 5 )
+
+[node name="MeshInstance" type="MeshInstance" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
+transform = Transform( 50, 0, 0, 0, 50, 0, 0, 0, 50, 0, 0, 0 )
+mesh = ExtResource( 6 )
+material/0 = null
+material/1 = null
+material/2 = null
+material/3 = null
 
 [node name="Executor" type="Node" parent="."]
 script = ExtResource( 1 )

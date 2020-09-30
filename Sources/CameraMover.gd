@@ -17,21 +17,21 @@ func _process(delta):
 func _unhandled_input(event):
 	if event is InputEventKey:
 		if event.pressed:
-			if event.scancode == KEY_LEFT:
+			if event.scancode == KEY_A:
 				d_alpha = -velocity
-			if event.scancode == KEY_RIGHT:
+			if event.scancode == KEY_D:
 				d_alpha = velocity
-			if event.scancode == KEY_UP:
+			if event.scancode == KEY_W:
 				d_beta = -velocity
-			if event.scancode == KEY_DOWN:
+			if event.scancode == KEY_S:
 				d_beta = velocity
 		else:
-			if event.scancode == KEY_LEFT:
+			if event.scancode == KEY_A:
 				d_alpha = 0
-			if event.scancode == KEY_RIGHT:
+			if event.scancode == KEY_D:
 				d_alpha = 0
-			if event.scancode == KEY_UP:
+			if event.scancode == KEY_W:
 				d_beta = 0
-			if event.scancode == KEY_DOWN:
+			if event.scancode == KEY_S:
 				d_beta = 0
 

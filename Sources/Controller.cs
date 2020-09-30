@@ -158,11 +158,13 @@ public class Controller : Node
         {
             result[0] *= -1;
         }
-        if (q[2] * result[0] < 0)
+        float q3a = 0.5f * Mathf.Pi - Mathf.Atan2(Controller.l3, Controller.p3);
+        q3a = Mathf.Rad2Deg(q3a);
+        if ((q[2] + 90 - q3a) * result[0] < 0)
         {
             result[1] *= -1;
         }
-        if (q[5] < 0)
+        if (q[4] < 0)
         {
             result[2] *= -1;
         }
