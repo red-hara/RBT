@@ -64,7 +64,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "ptp(home)
 
-ptp({A1 = 45, A2 = -15, A3 = 15})
+ptp({A1 = -10, A2 = -15, A3 = 15})
 
 -- set robot tool
 tool({Z = 100})

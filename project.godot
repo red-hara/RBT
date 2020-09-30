@@ -20,6 +20,7 @@ run/main_scene="res://Main.tscn"
 boot_splash/image="res://logo.png"
 boot_splash/fullsize=false
 config/icon="res://icon.png"
+config/windows_native_icon="res://icon.ico"
 
 [mono]
 
