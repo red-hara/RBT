@@ -38,6 +38,8 @@ public class Controller : Node
 
     public bool finishedWithError = false;
 
+    public String currentError = null;
+
     public override void _Ready()
     {
         _robot = GetNode(robot) as Robot;
@@ -57,12 +59,12 @@ public class Controller : Node
             isMoving = false;
         }
 
-
         Array.Copy(this.q, _robot.q, 6);
     }
 
     public void Move(MotionCommand motion)
     {
+        currentError = null;
         isMoving = true;
         LinearCommand lin = motion as LinearCommand;
         if (lin != null)
@@ -89,7 +91,7 @@ public class Controller : Node
                 jnt.velocity
             );
             } catch (Exception ex) {
-                GD.Print(ex);
+                currentError = ex.Message;
                 finishedWithError = true;
             }
         }
@@ -108,7 +110,7 @@ public class Controller : Node
             }
             catch (Exception ex)
             {
-                GD.Print(ex);
+                currentError = ex.Message;
                 finishedWithError = true;
             }
 
@@ -410,7 +412,7 @@ public class Controller : Node
             }
             catch (SolutionException ex)
             {
-                GD.Print(ex.Message);
+                controller.currentError = ex.Message;
                 controller.currentInterpolation = null;
                 controller.finishedWithError = true;
             }

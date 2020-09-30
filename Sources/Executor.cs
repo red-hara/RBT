@@ -62,13 +62,15 @@ public class Executor : Node
                 worker.robot.currentPosition = controller.CurrentPosition(controller.q);
             }
 
-            if (worker.error == null)
-            {
-                _errorLabel.Text = "";
-            }
-            else
+            if (worker.error != null)
             {
                 _errorLabel.Text = worker.error;
+            }
+            else if (controller.currentError != null)
+            {
+                _errorLabel.Text = controller.currentError;
+            } else {
+                _errorLabel.Text = "";
             }
 
             if (worker.doneEverything || controller.finishedWithError)
