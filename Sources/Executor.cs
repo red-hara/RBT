@@ -272,6 +272,10 @@ public class Executor : Node
             currentCommand = command;
         }
 
+        public void wait(float seconds) {
+            System.Threading.Thread.Sleep((int)(seconds * 1000));
+        }
+
         private float LuaNumber2Float(object obj)
         {
             return Convert.ToSingle(obj);

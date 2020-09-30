@@ -1,7 +1,7 @@
 extends Spatial
 
 var velocity: float = PI / 8
-var alpha: float = 0
+var alpha: float = PI / 2
 var beta: float = -PI / 4
 var d_alpha: float = 0
 var d_beta: float = 0

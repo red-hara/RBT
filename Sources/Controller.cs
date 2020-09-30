@@ -79,11 +79,19 @@ public class Controller : Node
         JointCommand jnt = motion as JointCommand;
         if (jnt != null)
         {
+            try {
+                float[] target = jnt.target.AsArray(q);
+                VerifySolution(target);
+            
             currentInterpolation = new JointInterpolation(
                 q,
                 jnt.target.AsArray(q),
                 jnt.velocity
             );
+            } catch (Exception ex) {
+                GD.Print(ex);
+                finishedWithError = true;
+            }
         }
 
         PtpCommand ptp = motion as PtpCommand;
@@ -164,6 +172,14 @@ public class Controller : Node
         for (int i = 0; i < 6; i++)
         {
             sol[i] = Mathf.Wrap(sol[i], -180, 180);
+        }
+        VerifySolution(sol);
+
+        return new Solution(sol);
+    }
+
+    public void VerifySolution(float[] sol) {
+        for (int i = 0; i < 6; i++) {
             if (sol[i] > max[i])
             {
                 throw new SolutionException("Axis A" + i + " out of limit: " + sol[i]);
@@ -173,8 +189,6 @@ public class Controller : Node
                 throw new SolutionException("Axis -A" + i + " out of limit: " + sol[i]);
             }
         }
-
-        return new Solution(sol);
     }
 
     public static float AngleTo(Vector3 v0, Vector3 v1, Vector3 n)

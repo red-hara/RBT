@@ -63,21 +63,34 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "robot:ptp(home, 1)
 
+robot:ptp({A1 = 45, A2 = -15, A3 = 15})
+
+-- set robot tool
 robot:tool({Z = 100})
 
+-- define variables
 boxHeight = 300
 boxSize = 100
 boxStep = 150
 boxOrigin = 350
 
+-- define target
 target = {X = boxOrigin, Y = 0, Z = boxHeight + boxSize, A = 0, B = 0, C = 180}
-robot:ptp(target)
+-- move in ptp to target
+robot:ptp(target, 0.5)
+-- wait 500 ms
+robot:wait(0.5)
+
+-- modify target
 target.X = target.X + boxStep
+-- move in lin to target
 robot:lin(target, 0.25)
+
 target.Y = target.Y - boxStep
 robot:lin(target, 0.25)
 target.X = target.X + boxStep
-robot:lin(target, 0.25)"
+robot:lin(target, 0.25)
+"
 highlight_current_line = true
 syntax_highlighting = true
 show_line_numbers = true
@@ -124,7 +137,7 @@ shadow_atlas_size = 8192
 [node name="Spatial" type="Spatial" parent="HBoxContainer/ViewportContainer/Viewport"]
 
 [node name="CameraMover" type="Spatial" parent="HBoxContainer/ViewportContainer/Viewport/Spatial"]
-transform = Transform( 1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0, 0 )
+transform = Transform( -1.62921e-07, -0.707107, 0.707107, 0, 0.707107, 0.707107, -1, 1.15202e-07, -1.15202e-07, 0, 0, 0 )
 script = ExtResource( 3 )
 
 [node name="Camera" type="Camera" parent="HBoxContainer/ViewportContainer/Viewport/Spatial/CameraMover"]
