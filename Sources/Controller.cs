@@ -168,13 +168,11 @@ public class Controller : Node
         {
             result[2] *= -1;
         }
-        GD.Print(result[0], result[1], result[2]);
         return result;
     }
 
     public Solution Solve(Position target, int i0, int i1, int i2)
     {
-        GD.Print(i0, i1, i2);
         target = target * tcp.Inverse();
         Position fifth = target * new Position(new Vector3(0, 0, -l4), Quat.Identity);
         Vector3 projection = new Vector3(fifth.pos.x, fifth.pos.y, 0);

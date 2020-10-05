@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Sources/Executor.cs" type="Script" id=1]
 [ext_resource path="res://Robot.tscn" type="PackedScene" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://Models/floor.obj" type="ArrayMesh" id=4]
 [ext_resource path="res://Models/Material.material" type="Material" id=5]
 [ext_resource path="res://Models/Axis.obj" type="ArrayMesh" id=6]
+[ext_resource path="res://Sources/HotkeyLauncher.cs" type="Script" id=7]
 
 [node name="Main" type="Control"]
 anchor_right = 1.0
@@ -244,5 +245,9 @@ robot = NodePath("../HBoxContainer/ViewportContainer/Viewport/Spatial/Robot")
 positionLabel = NodePath("../HBoxContainer/VBoxContainer/PositionLabel")
 errorLabel = NodePath("../HBoxContainer/VBoxContainer/ErrorLabel")
 text = NodePath("../HBoxContainer/VBoxContainer/TextEdit")
+
+[node name="HotkeyLauncher" type="Node" parent="."]
+script = ExtResource( 7 )
 [connection signal="button_down" from="HBoxContainer/VBoxContainer/HBoxContainer/Run" to="Executor" method="Run"]
 [connection signal="button_down" from="HBoxContainer/VBoxContainer/HBoxContainer/Abort" to="Executor" method="Abort"]
+[connection signal="Start" from="HotkeyLauncher" to="Executor" method="Run"]
