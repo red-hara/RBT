@@ -1,0 +1,31 @@
+ptp(home)
+
+-- set robot tool
+tool({Z = 100})
+
+-- define variables
+boxHeight = 300
+boxSize = 100
+boxStep = 150
+boxOrigin = 350
+
+function square()
+	ptp({X = 0, Y = 0, Z = -100, A = 0, B = 0, C = 0})
+	lin({Z = 0}, 0.25)
+	lin({X = boxSize / 2, Y = boxSize / 2}, 0.25)
+	lin({X = boxSize / 2, Y = -boxSize / 2}, 0.25)
+	lin({X = -boxSize / 2, Y = -boxSize / 2}, 0.25)
+	lin({X = -boxSize / 2, Y = boxSize / 2}, 0.25)
+	lin({X = 0, Y = 0}, 0.25)
+	lin({X = 0, Y = 0, Z = -100, A = 0, B = 0, C = 0}, 0.25)
+end
+
+orig = {X = boxOrigin, Y = 0, Z = boxHeight + boxSize, A = 0, B = 0, C = 180}
+for x = boxOrigin, boxOrigin + boxStep * 2, boxStep do
+	for y = 0, -boxStep * 2, -boxStep do
+		orig.X = x
+		orig.Y = y
+		origin(orig)
+		square()
+	end
+end

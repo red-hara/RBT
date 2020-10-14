@@ -28,6 +28,7 @@ public class Controller : Node
     private Robot _robot;
 
     public Position tcp = new Position();
+    public Position origin = new Position();
 
     public bool isMoving = false;
 
@@ -48,6 +49,7 @@ public class Controller : Node
     public override void _Process(float delta)
     {
         _robot.tcp.Transform = new Transform(tcp.rot, tcp.pos);
+        _robot.origin.Transform = new Transform(origin.rot, origin.pos);
 
         if (currentInterpolation != null)
         {
@@ -141,7 +143,7 @@ public class Controller : Node
         Position p4 = new Position(new Vector3(0, 0, 0), new Quat(Vector3.Up, Mathf.Deg2Rad(q[4])));
         Position p5 = new Position(new Vector3(l4, 0, 0), new Quat(Vector3.Right, Mathf.Deg2Rad(q[5])));
         Position p6 = new Position(new Vector3(0, 0, 0), new Quat(Vector3.Up, Mathf.Pi / 2) * new Quat(Vector3.Back, Mathf.Pi / 2));
-        Position result = p0 * p1 * p2 * p3 * p4 * p5 * p6 * tcp;
+        Position result = origin.Inverse() * p0 * p1 * p2 * p3 * p4 * p5 * p6 * tcp;
 
         return result;
     }
@@ -173,7 +175,7 @@ public class Controller : Node
 
     public Solution Solve(Position target, int i0, int i1, int i2)
     {
-        target = target * tcp.Inverse();
+        target = origin * target * tcp.Inverse();
         Position fifth = target * new Position(new Vector3(0, 0, -l4), Quat.Identity);
         Vector3 projection = new Vector3(fifth.pos.x, fifth.pos.y, 0);
         float q1 = AngleTo(Vector3.Right, projection, Vector3.Back) + Mathf.Pi / 2.0f - Mathf.Pi / 2.0f * i0;

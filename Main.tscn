@@ -65,9 +65,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "ptp(home)
 
-ptp({A1 = -10, A2 = -15, A3 = 15})
-
--- set robot tool
 tool({Z = 100})
 
 -- define variables
@@ -76,26 +73,36 @@ boxSize = 100
 boxStep = 150
 boxOrigin = 350
 
--- define target
-target = {X = boxOrigin, Y = 0, Z = boxHeight + boxSize, A = 0, B = 0, C = 180}
--- move in ptp to target
-ptp(target, 0.5)
--- wait 500 ms
-wait(0.5)
+function square(s, v)
+	lin({X = s, Y = s}, v)
+	lin({X = -s, Y = s}, v)
+	lin({X = -s, Y = -s}, v)
+	lin({X = s, Y = -s}, v)
+end
 
--- modify target
-target.X = target.X + boxStep
--- move in lin to target
-lin(target, 0.25)
+function box()
+	ptp({X = 0, Y = 0, Z = 100, A = 0, B = 0, C = 180})
+	lin({Z = 0}, 0.5)
+	square(boxSize / 2, 0.25)
+	lin({X = 0, Y = 0}, 0.5)
+	lin({Z = 100}, 0.5)
+end
 
-target.Y = target.Y - boxStep
-lin(target, 0.25)
-target.X = target.X + boxStep
-lin(target, 0.25)
+origin({X = boxOrigin, Y = 0, Z = boxHeight + boxSize, A = 0, B = 0, C = 0})
+box()
 
-target = current()
-target.Z = target.Z + boxStep
-lin(target, 0.25)
+lin({Y = boxStep})
+lin({C = 90})
+
+origin({
+	X = boxOrigin,
+	Y = boxSize / 2,
+	Z = boxHeight + boxSize / 2,
+	A = 0,
+	B = 0,
+	C = -90
+})
+box()
 "
 highlight_current_line = true
 syntax_highlighting = true

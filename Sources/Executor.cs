@@ -49,6 +49,7 @@ public class Executor : Node
         if (worker != null)
         {
             controller.tcp = worker.robot.currentTool;
+            controller.origin = worker.robot.currentOrigin;
             if (worker.robot.currentCommand != null && !controller.finishedWithError)
             {
                 controller.Move(worker.robot.currentCommand);
@@ -173,6 +174,9 @@ public class Executor : Node
                 function current()
                     return robot:current()
                 end
+                function origin(t)
+                    robot:origin(t)
+                end
                 ");
             try
             {
@@ -196,6 +200,7 @@ public class Executor : Node
         public bool doneCommand = false;
         public Controller.MotionCommand currentCommand = null;
         public Controller.Position currentTool = new Controller.Position();
+        public Controller.Position currentOrigin = new Controller.Position();
 
         public void lin(LuaTable table, float velocity)
         {
@@ -272,6 +277,12 @@ public class Executor : Node
         public void tool(LuaTable table)
         {
             currentTool = LuaTable2Position(table);
+            System.Threading.Thread.Sleep(1);
+        }
+
+        public void origin(LuaTable table)
+        {
+            currentOrigin = LuaTable2Position(table);
             System.Threading.Thread.Sleep(1);
         }
 

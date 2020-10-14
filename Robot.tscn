@@ -14,17 +14,18 @@
 [node name="Robot" type="Spatial"]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
 script = ExtResource( 9 )
-controllerPath = NodePath("Controller")
 q = PoolRealArray( 0, 0, 0, 0, 90, 0 )
-bone1 = NodePath("Bone0/Bone1")
-bone6 = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6")
 bone3 = NodePath("Bone0/Bone1/Bone2/Bone3")
 tcpPath = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6/Flange/Tcp")
 bone0 = NodePath("Bone0")
+controllerPath = NodePath("Controller")
+flangePath = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6/Flange")
+bone6 = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6")
+bone1 = NodePath("Bone0/Bone1")
 bone4 = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4")
 bone5 = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5")
-flangePath = NodePath("Bone0/Bone1/Bone2/Bone3/Bone4/Bone5/Bone6/Flange")
 bone2 = NodePath("Bone0/Bone1/Bone2")
+originPath = NodePath("Origin")
 
 [node name="Bone0" type="Spatial" parent="."]
 
@@ -98,3 +99,13 @@ material/3 = null
 script = ExtResource( 1 )
 robot = NodePath("..")
 q = PoolRealArray( 0, 0, 0, 0, 90, 0 )
+
+[node name="Origin" type="Spatial" parent="."]
+
+[node name="MeshInstance" type="MeshInstance" parent="Origin"]
+transform = Transform( 10, 0, 0, 0, -4.37114e-07, -10, 0, 10, -4.37114e-07, 0, 0, 0 )
+mesh = ExtResource( 10 )
+material/0 = null
+material/1 = null
+material/2 = null
+material/3 = null

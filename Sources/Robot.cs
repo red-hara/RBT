@@ -42,6 +42,10 @@ public class Robot : Node
 	public NodePath tcpPath;
 	public Spatial tcp;
 
+	[Export]
+	public NodePath originPath;
+	public Spatial origin;
+
 
 	public override void _Ready()
 	{
@@ -55,6 +59,7 @@ public class Robot : Node
 		flange = GetNode(flangePath) as Spatial;
 		controller = GetNode(controllerPath) as Controller;
 		tcp = GetNode(tcpPath) as Spatial;
+		origin = GetNode(originPath) as Spatial;
 	}
 
 	public override void _Process(float delta)
