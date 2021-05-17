@@ -16,6 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="RBT"
+config/description="Robot simulation software"
 run/main_scene="res://Main.tscn"
 boot_splash/image="res://logo.png"
 boot_splash/fullsize=false
